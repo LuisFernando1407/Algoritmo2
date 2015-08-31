@@ -2,9 +2,9 @@
 
 using namespace std;
 
-struct noh
-{
-    int valor , fb;
+struct noh{
+
+    int valor , altd , alte;
     noh *esquerda, *direita, *pai;
 };
 
@@ -35,6 +35,8 @@ void insereNoh(arvore &arv, int val)
     n->esquerda = NULL;
     n->direita = NULL;
     n->pai = NULL;
+   	n->altd = 0;
+   	n->alte =0;
 
     if(arv.raiz == NULL)
         arv.raiz = n;
@@ -141,15 +143,73 @@ int altura(noh* raiz)
 
     return 1 + maior;
 }
-noh* fatorb (noh * raiz){
-	int he = altura(raiz->esquerda);
-	int hd = altura(raiz->direita);
-	raiz->fb = hd - he;
+noh* rotacaoEsq(noh* n){
+	noh *aux1 , *aux2;
+	aux1 = n->direita;
+	aux2 = aux1->esquerda;
+	n->direita = aux2;
+	aux1->esquerda= n;
 	
-	if(raiz->fb == 2 != raiz->fb > 2){
-		
-		
+	if(n->direita == NULL){
+		n->altd = 0;
 	}
+ 	else if(n->direita->alte > n->direita->altd){
+ 		n->altd = n->direita->alte+1;
+	 }else{
+	 	n->altd = n->direita->altd+1;
+	 }
+	 if(aux1->esquerda->alte > aux1->esquerda->altd){
+	 	aux1->alte = aux1->esquerda->alte+1;
+	 }else{
+	 	aux1->alte = aux1->esquerda->altd+1;
+	 
+	 }	return aux1;
+	 
+}
+noh* rotacaoDir(noh* n){
+	noh *aux1 , *aux2;
+	aux1 = n->esquerda;
+	aux2 = aux1->direita;
+	n->esquerda = aux2;
+	aux1->direita= n;
+	
+	if(n->esquerda == NULL){
+		n->alte = 0;
+	}
+ 	else if(n->esquerda->alte > n->esquerda->altd){
+ 		n->alte = n->esquerda->alte+1;
+	 }else{
+	 	n->alte= n->esquerda->altd+1;
+	 }
+	 if(aux1->direita->alte > aux1->direita->altd){
+	 	aux1->altd = aux1->direita->altd+1;
+	 }else{
+	 	aux1->altd = aux1->direita->altd+1;
+	 
+	 }	return aux1;
+}
+noh* fatorb (noh* n){
+	int d , df;
+	d = n->altd - n->alte;
+	if(d == 2){
+		df = n->direita->altd - n->direita->alte;
+		if(df >=0 ){
+			n = rotacaoEsq(n);
+		}else{
+			n->direita = rotacaoDir(n->direita);
+			n = rotacaoEsq(n);
+		}
+	}
+	else if (d == -2){
+		df = n->esquerda->altd - n->esquerda->alte;
+		if(df <= 0){
+			n = rotacaoDir(n);
+		}else{
+			n->esquerda = rotacaoEsq(n->esquerda);
+			n = rotacaoDir(n);
+		}
+	}
+	return n;
 }
 noh* busca(arvore &a, int val)
 {
