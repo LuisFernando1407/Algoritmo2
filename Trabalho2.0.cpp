@@ -27,6 +27,7 @@ int altura(noh* raiz);
 noh* busca(arvore &a, int val);
 void remover(arvore &a, int val);
 void removerRec(noh* n);
+noh* desalocar(noh* n);
 
 void insereNoh(arvore &arv, int val)
 {
@@ -283,7 +284,7 @@ int main()
 	noh* aux;
 	int op, valor;
 
-	// A arvore est· vazia, logo:
+	// A arvore est√° vazia, logo:
 	a.raiz = NULL;
 
 	do {
