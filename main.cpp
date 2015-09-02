@@ -1,6 +1,5 @@
-
 #include <iostream>
-
+#include <stdlib.h>
 using namespace std;
 
 struct noh {
@@ -27,7 +26,13 @@ void insereRec(noh* raiz, noh* n);
 
 int altura(noh* raiz);
 int calcula_fb(noh* n);
+
 noh* balanceamento(noh* n);
+
+noh* rotacaoEsq(noh* n);
+noh* rotacaoDir(noh* n);
+noh* rotacaoDirEsq(noh* n);
+noh* rotacaoEsqDir(noh* n);
 
 noh* busca(arvore &a, int val);
 noh* maisEsquerda(noh* raiz);
@@ -95,6 +100,7 @@ void insereNoh(arvore &arv, int val)
 		arv.raiz = n;
 	else
 		insereRec(arv.raiz, n);
+		
 }
 
 void insereRec(noh* raiz, noh* n)
@@ -108,6 +114,7 @@ void insereRec(noh* raiz, noh* n)
 			raiz->direita = n;
 			n->pai = raiz;
 		}
+		balanceamento(n);
 	}
 	else {
 		if (raiz->esquerda != NULL)
@@ -116,7 +123,9 @@ void insereRec(noh* raiz, noh* n)
 		{
 			raiz->esquerda = n;
 			n->pai = raiz;
+		
 		}
+		balanceamento(n);
 	}
 }
 
@@ -136,21 +145,22 @@ int altura(noh* raiz)
 }
 
 noh* rotacaoEsq(noh* n) {
+	
 
-	if (n->direita != NULL) {
+
 		n->direita->pai = n->pai;
 		n->pai = n->direita;
 		n->direita = n->pai->esquerda;
 		n->direita->pai = n;
 		n->pai->esquerda = n;
-
-	}
+	
+	cout << "Entrou rotEsq" << endl;
+		
 	return n;
-
 }
 
 noh* rotacaoDir(noh* n) {
-	if (n->esquerda != NULL) {
+	if (n != NULL) {
 
 		n->esquerda->pai = n->pai;
 		n->pai = n->esquerda;
@@ -180,8 +190,12 @@ int calcula_fb(noh* n) {
 	if (n == NULL) return 0;
 	int hd = altura(n->direita);
 	int he = altura(n->esquerda);
-	return n->fb = hd - he;
+	n->fb = hd - he;
+	calcula_fb(n->pai);
+	return n->fb;
 }
+
+
 
 noh* balanceamento(noh* n) {
 
@@ -189,11 +203,14 @@ noh* balanceamento(noh* n) {
 	if (n != NULL) {
 
 		n->fb = calcula_fb(n);
+	
+		
+		cout << "fb: " << n->fb << endl;
 
 		if (n->fb == 2) {
-			n->esquerda->fb = calcula_fb(n->esquerda);
-			if (n->esquerda->fb > 0) {
-				n = rotacaoDir(n);
+			n->direita->fb = calcula_fb(n);
+			if (n->direita->fb >= 0) {
+				n = rotacaoEsq(n);
 			}
 			else {
 				n = rotacaoDirEsq(n);
@@ -201,19 +218,18 @@ noh* balanceamento(noh* n) {
 			}
 		}
 
-		if (n->direita->fb == -2) {
-			n->esquerda->fb = calcula_fb(n->direita);
-			if (n->direita->fb < 0)
-				n = rotacaoEsq(n);
+		if (n->fb == -2) {
+			n->esquerda->fb = calcula_fb(n->esquerda);
+			if (n->esquerda->fb <= 0)
+				n = rotacaoDir(n);
 
 		}
 		else {
 			n = rotacaoEsqDir(n);
 
 		}
-		n->esquerda = balanceamento(n->esquerda);
-		n->direita = balanceamento(n->direita);
 	}
+	cout << "Entrou balanceamento";
 	return n;
 }
 
@@ -306,7 +322,7 @@ int main()
 
 	do {
 
-		system("cls");
+
 
 		cout << "\n----- MENU DE OPCOES -----" << endl;
 		cout << "1 - Inserir na arvore" << endl;
@@ -424,7 +440,7 @@ int main()
 					system("pause");
 				}
 			}
-
+				break;
 		case 7:
 
 			if (a.raiz == NULL) {
@@ -452,3 +468,6 @@ int main()
 	system("pause");
 	return 0;
 }
+
+  
+
