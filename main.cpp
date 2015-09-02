@@ -14,58 +14,28 @@ struct arvore
 	noh *raiz;
 };
 
-void insereNoh(arvore &arv, int val);
-void insereRec(noh* raiz, noh* n);
+// Assinaturas de métodos:
 void preOrdem(arvore &arv);
 void preOrdemRec(noh* n);
 void emOrdem(arvore &arv);
 void emOrdemRec(noh* n);
 void posOrdem(arvore &arv);
 void posOrdemRec(noh* n);
+
+void insereNoh(arvore &arv, int val);
+void insereRec(noh* raiz, noh* n);
+
+int altura(noh* raiz);
+int calcula_fb(noh* n);
+noh* balanceamento(noh* n);
+
+noh* busca(arvore &a, int val);
 noh* maisEsquerda(noh* raiz);
 noh* maisDireita(noh* raiz);
-int altura(noh* raiz);
-noh* busca(arvore &a, int val);
+
 void remover(arvore &a, int val);
 void removerRec(noh* n);
-noh* balanceamento(noh* n);
-int calcula_fb(noh* n);
-void insereNoh(arvore &arv, int val)
-{
-	noh* n = new noh();
-	n->valor = val;
-	n->esquerda = NULL;
-	n->direita = NULL;
-	n->pai = NULL;
-	n->fb=0;
-	if (arv.raiz == NULL)
-		arv.raiz = n;
-	else
-		insereRec(arv.raiz, n);
-}
 
-void insereRec(noh* raiz, noh* n)
-{
-	if (raiz->valor < n->valor)
-	{	
-		if (raiz->direita != NULL)
-			insereRec(raiz->direita, n);
-		else
-		{
-			raiz->direita = n;
-			n->pai = raiz;
-		}
-	} 
-	else {
-		if (raiz->esquerda != NULL)
-			insereRec(raiz->esquerda, n);
-		else
-		{
-			raiz->esquerda = n;
-			n->pai = raiz;
-		}
-	} 
-}
 
 void preOrdem(arvore &arv)
 {
@@ -112,25 +82,45 @@ void posOrdemRec(noh* n)
 	}
 }
 
-noh* maisEsquerda(noh* raiz)
+void insereNoh(arvore &arv, int val)
 {
-	noh* p = raiz;
+	noh* n = new noh();
+	n->valor = val;
+	n->esquerda = NULL;
+	n->direita = NULL;
+	n->pai = NULL;
+	n->fb = 0;
 
-	while (p->esquerda != NULL)
-		p = p->esquerda;
-
-	return p;
+	if (arv.raiz == NULL)
+		arv.raiz = n;
+	else
+		insereRec(arv.raiz, n);
 }
 
-noh* maisDireita(noh* raiz)
+void insereRec(noh* raiz, noh* n)
 {
-	noh* p = raiz;
-
-	while (p->direita != NULL)
-		p = p->direita;
-
-	return p;
+	if (raiz->valor < n->valor)
+	{
+		if (raiz->direita != NULL)
+			insereRec(raiz->direita, n);
+		else
+		{
+			raiz->direita = n;
+			n->pai = raiz;
+		}
+	}
+	else {
+		if (raiz->esquerda != NULL)
+			insereRec(raiz->esquerda, n);
+		else
+		{
+			raiz->esquerda = n;
+			n->pai = raiz;
+		}
+	}
 }
+
+
 
 int altura(noh* raiz)
 {
@@ -146,48 +136,48 @@ int altura(noh* raiz)
 }
 
 noh* rotacaoEsq(noh* n) {
-	
-	if(n->direita != NULL){
-	n->direita->pai = n->pai;
-	n->pai = n->direita;
-	n->direita = n->pai->esquerda;
-	n->direita->pai = n;
-	n->pai->esquerda = n;
-	
+
+	if (n->direita != NULL) {
+		n->direita->pai = n->pai;
+		n->pai = n->direita;
+		n->direita = n->pai->esquerda;
+		n->direita->pai = n;
+		n->pai->esquerda = n;
+
 	}
 	return n;
 
 }
 
 noh* rotacaoDir(noh* n) {
-		if(n->esquerda != NULL){
-		
+	if (n->esquerda != NULL) {
+
 		n->esquerda->pai = n->pai;
 		n->pai = n->esquerda;
 		n->esquerda = n->pai->direita;
 		n->esquerda->pai = n;
 		n->pai->direita = n;
-		
+
 	}
 	return n;
 }
-noh* rotacaoDirEsq( noh* n){
-	 if(n->direita && n->esquerda !=NULL){
-	 	rotacaoDir(n->direita);
-	 	rotacaoEsq(n);
-	 }return n;
-	
+noh* rotacaoDirEsq(noh* n) {
+	if (n->direita && n->esquerda != NULL) {
+		rotacaoDir(n->direita);
+		rotacaoEsq(n);
+	}return n;
+
 }
-noh* rotacaoEsqDir(noh* n){
-	if(n->esquerda && n->direita != NULL){
+noh* rotacaoEsqDir(noh* n) {
+	if (n->esquerda && n->direita != NULL) {
 		rotacaoEsq(n->esquerda);
 		rotacaoDir(n);
 	}return n;
 }
 
 
-int calcula_fb(noh* n){
-	if(n == NULL) return 0;
+int calcula_fb(noh* n) {
+	if (n == NULL) return 0;
 	int hd = altura(n->direita);
 	int he = altura(n->esquerda);
 	return n->fb = hd - he;
@@ -195,29 +185,31 @@ int calcula_fb(noh* n){
 
 noh* balanceamento(noh* n) {
 
-	
-	if(n != NULL){
 
-	n->fb = calcula_fb(n);
-	
-	if(n->fb == 2){
-		n->esquerda->fb = calcula_fb(n->esquerda);
-		if(n->esquerda->fb > 0 ){
-			n = rotacaoDir(n);		
-		}else{
-		n = rotacaoDirEsq(n);
-			
+	if (n != NULL) {
+
+		n->fb = calcula_fb(n);
+
+		if (n->fb == 2) {
+			n->esquerda->fb = calcula_fb(n->esquerda);
+			if (n->esquerda->fb > 0) {
+				n = rotacaoDir(n);
+			}
+			else {
+				n = rotacaoDirEsq(n);
+
+			}
 		}
-	}
-	
-	if(n->direita->fb == -2){
-		n->esquerda->fb = calcula_fb(n->direita);
-		if(n->direita->fb < 0)
-			n = rotacaoEsq(n);
-			
-		}else{
+
+		if (n->direita->fb == -2) {
+			n->esquerda->fb = calcula_fb(n->direita);
+			if (n->direita->fb < 0)
+				n = rotacaoEsq(n);
+
+		}
+		else {
 			n = rotacaoEsqDir(n);
-			
+
 		}
 		n->esquerda = balanceamento(n->esquerda);
 		n->direita = balanceamento(n->direita);
@@ -249,7 +241,27 @@ void remover(arvore &a, int val)
 	if (n == NULL) return;
 
 	removerRec(n);
-	
+
+}
+
+noh* maisEsquerda(noh* raiz)
+{
+	noh* p = raiz;
+
+	while (p->esquerda != NULL)
+		p = p->esquerda;
+
+	return p;
+}
+
+noh* maisDireita(noh* raiz)
+{
+	noh* p = raiz;
+
+	while (p->direita != NULL)
+		p = p->direita;
+
+	return p;
 }
 
 
@@ -289,13 +301,13 @@ int main()
 	noh* aux;
 	int op, valor;
 
-	// A arvore est? vazia, logo:
+	// A arvore esta vazia, logo:
 	a.raiz = NULL;
 
 	do {
-		
+
 		system("cls");
-		
+
 		cout << "\n----- MENU DE OPCOES -----" << endl;
 		cout << "1 - Inserir na arvore" << endl;
 		cout << "2 - Consultar um noh da arvore" << endl;
@@ -307,20 +319,20 @@ int main()
 		cout << "8 - Sair" << endl;
 		cout << "\nInsira sua opcao: " << endl;
 		cin >> op;
-		
-		
-		switch (op){
-		
+
+
+		switch (op) {
+
 		case 1:
-		
+
 			cout << "Digite o numero a ser inserido na arvore: " << endl;
 			cin >> valor;
 
 			insereNoh(a, valor);
 			break;
-			
+
 		case 2:
-		
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -343,10 +355,10 @@ int main()
 					system("pause");
 				}
 			}
-		 break;
-		 
+			break;
+
 		case 3:
-		
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -357,11 +369,11 @@ int main()
 				preOrdem(a);
 				system("pause");
 			}
-		 break;
-		 
+			break;
+
 		case 4:
-			
-		
+
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -374,7 +386,7 @@ int main()
 			}
 			break;
 		case 5:
-		
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -385,10 +397,10 @@ int main()
 				posOrdem(a);
 				system("pause");
 			}
-		 break;
-		 
+			break;
+
 		case 6:
-		
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -412,9 +424,9 @@ int main()
 					system("pause");
 				}
 			}
-		
+
 		case 7:
-		
+
 			if (a.raiz == NULL) {
 				cout << "A arvore esta vazia!!!" << endl;
 				system("pause");
@@ -425,17 +437,17 @@ int main()
 				cout << "Arvore esvaziada!!!" << endl;
 				system("pause");
 			}
-		break;
-		
+			break;
+
 		case 8:
 			op = 8;
 			break;
-					
+
 		default:
 			cout << "Opcao invalida" << endl;
 		}
 	} while (op != 8);
-	
+
 
 	system("pause");
 	return 0;
