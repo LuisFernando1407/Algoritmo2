@@ -23,9 +23,10 @@ void posOrdemRec(noh* n);
 
 void insereNoh(arvore &arv, int val);
 void insereRec(noh* raiz, noh* n);
+void atualizar (arvore &arv, noh* n);
 
 int altura(noh* raiz);
-int calcula_fb(noh* n);
+void calcula_fb(noh* n);
 
 noh* balanceamento(noh* n);
 
@@ -41,7 +42,171 @@ noh* maisDireita(noh* raiz);
 void remover(arvore &a, int val);
 void removerRec(noh* n);
 
+void insereNoh(arvore &arv, int val)
+{
+	noh* n = new noh();
+	n->valor = val;
+	n->esquerda = NULL;
+	n->direita = NULL;
+	n->pai = NULL;
+	n->fb = 0;
 
+	if (arv.raiz == NULL)
+		arv.raiz = n;
+	else
+		insereRec(arv.raiz, n);
+		
+	
+}
+
+void insereRec(noh* raiz, noh* n)
+{
+	if (raiz->valor < n->valor)
+	{
+		if (raiz->direita != NULL)
+			insereRec(raiz->direita, n);
+		else
+		{
+			raiz->direita = n;
+			n->pai = raiz;
+			calcula_fb(n->pai);
+		}
+		
+	}
+	else {
+		if (raiz->esquerda != NULL)
+			insereRec(raiz->esquerda, n);
+		else
+		{
+			raiz->esquerda = n;
+			n->pai = raiz;
+			calcula_fb(n->pai);
+		
+		}
+	}
+	
+}
+
+
+
+int altura(noh* raiz)
+{
+	if (raiz == NULL)
+		return 0;
+
+	int he = altura(raiz->esquerda);
+	int hd = altura(raiz->direita);
+
+	int maior = (he > hd) ? he : hd;
+
+	return 1 + maior;
+}
+
+noh* rotacaoEsq(noh* n) {
+	
+
+
+		n->direita->pai = n->pai;
+		n->pai = n->direita;
+		n->direita = n->pai->esquerda;
+		
+		if(n->direita != NULL){
+		
+		n->direita->pai = n;
+		n->pai->esquerda = n;
+		
+		}
+	
+		
+	return n;
+}
+
+noh* rotacaoDir(noh* n) {
+	
+
+		n->esquerda->pai = n->pai;
+		n->pai = n->esquerda;
+		n->esquerda = n->pai->direita;
+		
+		if(n->esquerda != NULL){
+		
+		n->esquerda->pai = n;
+		n->pai->direita = n;
+
+		}
+	return n;
+}
+
+noh* rotacaoDirEsq(noh* n) {
+
+		rotacaoDir(n->direita);
+		rotacaoEsq(n);
+	return n;
+
+}
+noh* rotacaoEsqDir(noh* n) {
+	
+		rotacaoEsq(n->esquerda);
+		rotacaoDir(n);
+	return n;
+}
+
+
+void calcula_fb(noh* n) {
+	if (n == NULL) return;
+	
+	n->fb =altura(n->direita) - altura(n->esquerda);
+	if(n->fb <= -2 || n->fb >= 2){
+	
+		balanceamento(n);
+	
+	}else{
+		calcula_fb(n->pai);
+	}
+
+}
+
+noh* balanceamento(noh* n) {
+
+
+	if (n != NULL) {
+
+		
+	
+
+		if (n->fb >= 2) {
+			if (n->direita->fb >= 0) {
+				n = rotacaoEsq(n);
+				calcula_fb(n->esquerda);
+			}
+			else {
+				n = rotacaoDirEsq(n->direita);
+
+			}
+		}
+
+	if (n->fb <= -2) {
+			
+			if (n->esquerda->fb <= 0){
+			
+				n = rotacaoDir(n);
+				calcula_fb(n->direita);
+			}
+			else {
+			n = rotacaoEsqDir(n->esquerda);
+			}
+		}
+	}
+	
+	return n;
+}
+void atualizar (arvore &arv, noh* n){
+	while(n->pai != NULL){
+		n = n->pai;
+		
+	}
+	arv.raiz = n;
+}
 void preOrdem(arvore &arv)
 {
 	preOrdemRec(arv.raiz);
@@ -87,151 +252,6 @@ void posOrdemRec(noh* n)
 	}
 }
 
-void insereNoh(arvore &arv, int val)
-{
-	noh* n = new noh();
-	n->valor = val;
-	n->esquerda = NULL;
-	n->direita = NULL;
-	n->pai = NULL;
-	n->fb = 0;
-
-	if (arv.raiz == NULL)
-		arv.raiz = n;
-	else
-		insereRec(arv.raiz, n);
-		
-}
-
-void insereRec(noh* raiz, noh* n)
-{
-	if (raiz->valor < n->valor)
-	{
-		if (raiz->direita != NULL)
-			insereRec(raiz->direita, n);
-		else
-		{
-			raiz->direita = n;
-			n->pai = raiz;
-		}
-		balanceamento(n);
-	}
-	else {
-		if (raiz->esquerda != NULL)
-			insereRec(raiz->esquerda, n);
-		else
-		{
-			raiz->esquerda = n;
-			n->pai = raiz;
-		
-		}
-		balanceamento(n);
-	}
-}
-
-
-
-int altura(noh* raiz)
-{
-	if (raiz == NULL)
-		return 0;
-
-	int he = altura(raiz->esquerda);
-	int hd = altura(raiz->direita);
-
-	int maior = (he > hd) ? he : hd;
-
-	return 1 + maior;
-}
-
-noh* rotacaoEsq(noh* n) {
-	
-
-
-		n->direita->pai = n->pai;
-		n->pai = n->direita;
-		n->direita = n->pai->esquerda;
-		n->direita->pai = n;
-		n->pai->esquerda = n;
-	
-	cout << "Entrou rotEsq" << endl;
-		
-	return n;
-}
-
-noh* rotacaoDir(noh* n) {
-	if (n != NULL) {
-
-		n->esquerda->pai = n->pai;
-		n->pai = n->esquerda;
-		n->esquerda = n->pai->direita;
-		n->esquerda->pai = n;
-		n->pai->direita = n;
-
-	}
-	return n;
-}
-noh* rotacaoDirEsq(noh* n) {
-	if (n->direita && n->esquerda != NULL) {
-		rotacaoDir(n->direita);
-		rotacaoEsq(n);
-	}return n;
-
-}
-noh* rotacaoEsqDir(noh* n) {
-	if (n->esquerda && n->direita != NULL) {
-		rotacaoEsq(n->esquerda);
-		rotacaoDir(n);
-	}return n;
-}
-
-
-int calcula_fb(noh* n) {
-	if (n == NULL) return 0;
-	int hd = altura(n->direita);
-	int he = altura(n->esquerda);
-	n->fb = hd - he;
-	calcula_fb(n->pai);
-	return n->fb;
-}
-
-
-
-noh* balanceamento(noh* n) {
-
-
-	if (n != NULL) {
-
-		n->fb = calcula_fb(n);
-	
-		
-		cout << "fb: " << n->fb << endl;
-
-		if (n->fb == 2) {
-			n->direita->fb = calcula_fb(n);
-			if (n->direita->fb >= 0) {
-				n = rotacaoEsq(n);
-			}
-			else {
-				n = rotacaoDirEsq(n);
-
-			}
-		}
-
-		if (n->fb == -2) {
-			n->esquerda->fb = calcula_fb(n->esquerda);
-			if (n->esquerda->fb <= 0)
-				n = rotacaoDir(n);
-
-		}
-		else {
-			n = rotacaoEsqDir(n);
-
-		}
-	}
-	cout << "Entrou balanceamento";
-	return n;
-}
 
 noh* busca(arvore &a, int val)
 {
@@ -249,17 +269,6 @@ noh* busca(arvore &a, int val)
 
 	return r;
 }
-
-void remover(arvore &a, int val)
-{
-	noh* n = busca(a, val);
-
-	if (n == NULL) return;
-
-	removerRec(n);
-
-}
-
 noh* maisEsquerda(noh* raiz)
 {
 	noh* p = raiz;
@@ -280,6 +289,16 @@ noh* maisDireita(noh* raiz)
 	return p;
 }
 
+void remover(arvore &a, int val)
+{
+	noh* n = busca(a, val);
+
+	if (n == NULL) return;
+
+	removerRec(n);
+
+}
+
 
 void removerRec(noh* n)
 {
@@ -289,6 +308,7 @@ void removerRec(noh* n)
 		if (n == p->esquerda) p->esquerda = NULL;
 		else p->direita = NULL;
 		delete n;
+		calcula_fb(p);
 		return;
 	}
 
@@ -323,7 +343,7 @@ int main()
 	do {
 
 
-
+		system("cls");
 		cout << "\n----- MENU DE OPCOES -----" << endl;
 		cout << "1 - Inserir na arvore" << endl;
 		cout << "2 - Consultar um noh da arvore" << endl;
@@ -470,4 +490,3 @@ int main()
 }
 
   
-
